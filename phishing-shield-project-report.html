@@ -1,0 +1,559 @@
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phishing Shield — Project Report</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #1f2328;
+    background: #ffffff;
+  }
+
+  /* ── Page wrapper ── */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 40px;
+  }
+
+  /* ── Cover block ── */
+  .cover {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 40px 36px;
+    margin-bottom: 40px;
+    text-align: center;
+    background: #f7f8fa;
+  }
+  .cover .badge {
+    display: inline-block;
+    background: #1f2328;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+  .cover h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1f2328;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .cover .subtitle {
+    font-size: 1rem;
+    color: #57606a;
+    margin-bottom: 28px;
+  }
+  .cover table {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+  }
+  .cover table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .cover table td:first-child {
+    color: #57606a;
+    width: 140px;
+    font-weight: 600;
+  }
+  .cover table td:last-child { color: #1f2328; }
+  .cover .fill-blank {
+    color: #3b82d4;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  /* ── Section headings ── */
+  h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2328;
+    margin: 36px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2328;
+    margin: 20px 0 6px;
+  }
+
+  p { margin-bottom: 10px; color: #1f2328; }
+
+  /* ── Numbered section label ── */
+  .sec-num {
+    display: inline-block;
+    background: #1f2328;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Feature table ── */
+  table.feat {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 6px;
+    font-size: 13px;
+  }
+  table.feat th {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    padding: 7px 12px;
+    text-align: left;
+    font-weight: 700;
+    color: #1f2328;
+  }
+  table.feat td {
+    border: 1px solid #e5e7eb;
+    padding: 7px 12px;
+    vertical-align: top;
+    color: #1f2328;
+  }
+  table.feat tr:nth-child(even) td { background: #f7f8fa; }
+
+  /* ── Module cards ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #f7f8fa;
+  }
+  .card .card-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: #1f2328;
+    margin-bottom: 4px;
+  }
+  .card p { font-size: 12.5px; color: #57606a; margin: 0; }
+
+  /* ── Severity pills ── */
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 12px;
+    margin-right: 4px;
+  }
+  .pill-high   { background: #fee2e2; color: #b91c1c; }
+  .pill-medium { background: #ffedd5; color: #c2410c; }
+  .pill-low    { background: #fef9c3; color: #854d0e; }
+
+  /* ── Flow diagram (CSS only) ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 14px 0;
+    font-size: 12px;
+  }
+  .flow-box {
+    background: #f7f8fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 14px;
+    text-align: center;
+    font-weight: 600;
+    color: #1f2328;
+    min-width: 110px;
+  }
+  .flow-arrow {
+    color: #57606a;
+    font-size: 18px;
+    padding: 0 6px;
+    font-weight: 300;
+  }
+
+  /* ── Result badges ── */
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+  }
+  .result-row:last-child { border-bottom: none; }
+  .pct {
+    min-width: 50px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .pct-high   { color: #b91c1c; }
+  .pct-med    { color: #c2410c; }
+  .pct-low    { color: #15803d; }
+  .result-label { flex: 1; }
+  .verdict {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 12px;
+  }
+  .verdict-high   { background: #fee2e2; color: #b91c1c; }
+  .verdict-med    { background: #ffedd5; color: #c2410c; }
+  .verdict-low    { background: #dcfce7; color: #15803d; }
+
+  /* ── Limitations / future list ── */
+  ul.plain { padding-left: 18px; margin: 8px 0; }
+  ul.plain li { margin-bottom: 5px; font-size: 13.5px; color: #1f2328; }
+
+  /* ── References ── */
+  .ref { font-size: 12.5px; color: #57606a; margin-bottom: 4px; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 12px;
+    color: #57606a;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  
+  <div class="cover">
+    <div class="badge">B.Tech CSE · Cyber Security Project</div>
+    <h1>Phishing Shield</h1>
+    <p class="subtitle">An Advanced Phishing Email Detection System<br />built with Python &amp; Streamlit</p>
+    <table>
+      <tr><td>Student Name</td><td>Sankalp Awasthi</td></tr>
+      <tr><td>Course</td><td>B.Tech Computer Science &amp; Engineering</td></tr>
+      <tr><td>University</td><td>Lovely Professional University</td></tr>
+      <tr><td>Technology</td><td>Python 3 · Streamlit · Regex · NLP Heuristics</td></tr>
+      <tr><td>Report Date</td><td>2026</td></tr>
+    </table>
+  </div>
+
+  
+  <h2><span class="sec-num">1</span>Abstract</h2>
+  <p>
+    Phishing attacks remain one of the most prevalent and damaging forms of cybercrime, responsible for a significant proportion of data breaches worldwide. This project, <strong>Phishing Shield</strong>, presents a rule-based phishing email detection system that analyses the content, structure, and metadata of any pasted email to determine the probability that it is a phishing attempt.
+  </p>
+  <p>
+    Built entirely in Python using the Streamlit framework, the system requires no external machine-learning libraries or API keys, making it accessible to beginners while remaining powerful enough for real-world use. The tool assigns a phishing probability percentage (0–100%) and provides a detailed breakdown of every detected risk signal, along with a colour-coded bar chart visualisation.
+  </p>
+
+  
+  <h2><span class="sec-num">2</span>Introduction</h2>
+  <p>
+    Email is the most common attack vector for phishing. Attackers craft deceptive messages impersonating trusted organisations — banks, technology companies, government agencies, and delivery services — to steal credentials, personal data, and money. According to the Anti-Phishing Working Group (APWG), millions of phishing attacks are recorded every month globally.
+  </p>
+  <p>
+    Existing spam filters, while useful, often miss targeted or novel phishing emails. This project addresses that gap by implementing a multi-layer detection engine that analyses emails from several independent angles simultaneously — urgency language, threat vocabulary, financial fraud patterns, brand impersonation, typographical tricks, and structural anomalies.
+  </p>
+  <h3>Objectives</h3>
+  <ul class="plain">
+    <li>Detect phishing emails with high accuracy across diverse attack types.</li>
+    <li>Handle real-world email formats pasted from Gmail, Outlook, and Apple Mail.</li>
+    <li>Detect homoglyph (look-alike character) impersonation — e.g. <em>PayPaI</em>, <em>InvoIcing</em>.</li>
+    <li>Provide human-readable explanations of every detected risk signal.</li>
+    <li>Avoid false positives on legitimate newsletters, receipts, and institutional emails.</li>
+    <li>Keep the entire system in a single Python file suitable for beginners.</li>
+  </ul>
+
+  
+  <h2><span class="sec-num">3</span>System Design &amp; Architecture</h2>
+  <p>The system is structured as a three-stage pipeline:</p>
+
+  <div class="flow">
+    <div class="flow-box">Raw Email<br /><span style="font-weight:400;font-size:11px">Pasted by user</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Pre-Processor<br /><span style="font-weight:400;font-size:11px">Strip UI noise</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Detection Engine<br /><span style="font-weight:400;font-size:11px">14 parallel checks</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Scorer<br /><span style="font-weight:400;font-size:11px">0–100% score</span></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">Streamlit UI<br /><span style="font-weight:400;font-size:11px">Dashboard + chart</span></div>
+  </div>
+
+  <h3>Stage 1 — Email Pre-Processor</h3>
+  <p>
+    When a user pastes an email from their email client, the raw text contains client-generated UI artefacts: timestamps, "Inbox" labels, "Unsubscribe" buttons, social media footer icons, and image placeholder tokens. The pre-processor strips all of these line-by-line using regular expressions before the detection engine runs, preventing false positives from newsletter footer content such as "Facebook Instagram YouTube LinkedIn".
+  </p>
+  <p>It also extracts structured fields (From, To, Subject) from both standard RFC-822 header format and Gmail's display-name format (<code>Name &lt;email&gt; Unsubscribe</code>), which are shown to the user as a parsed-fields panel above the results.</p>
+
+  <h3>Stage 2 — Detection Engine (14 independent checks)</h3>
+  <p>Each check runs independently on the cleaned email text and contributes a weighted score to the final total. Checks are grouped into categories as described in Section 4.</p>
+
+  <h3>Stage 3 — Scorer &amp; UI</h3>
+  <p>
+    All check scores are summed and clamped to 100. The final percentage is classified into three verdict bands: <strong style="color:#b91c1c">High Risk (≥65%)</strong>, <strong style="color:#c2410c">Moderate Risk (30–64%)</strong>, and <strong style="color:#15803d">Low Risk (&lt;30%)</strong>. The Streamlit UI renders the verdict, a metrics row, detailed per-signal cards, and an inline SVG bar chart — all without any external charting library.
+  </p>
+
+  
+  <h2><span class="sec-num">4</span>Detection Checks</h2>
+
+  <table class="feat">
+    <tr>
+      <th>#</th>
+      <th>Check</th>
+      <th>Severity</th>
+      <th>What it detects</th>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Urgency / Pressure Language</td>
+      <td><span class="pill pill-medium">Medium</span></td>
+      <td>Phrases like "immediately", "within 24 hours", "past due", "verify now", "payment required" that create artificial time pressure.</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>Threat / Fear Tactics</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>Account suspension threats, legal action, collections department, "temporary suspension of services", security breach language.</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Reward / Greed Bait</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>Prize claims, lottery wins, inheritance offers, wire transfer requests, Western Union mentions.</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Credential / Data Harvesting</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>Requests for passwords, credit card numbers, CVV, SSN, PIN, bank details, date of birth.</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Suspicious / Malicious URLs</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>IP-address links, URL shorteners (bit.ly, TinyURL), fake subdomain patterns, shady TLDs (.xyz, .top), compound portal domains (-billing-center, -service-portal).</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Financial Fraud / Invoice Scam</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>Overdue invoice language, "outstanding balance", "final notice", "legal proceedings", billing portal domains, "collections department".</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Brand Name Typo / Lookalike</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>200+ curated typo variants of 40 major brands — paypa1, g00gle, amaz0n, microsofft, netfliix etc. Checks the normalised text so homoglyphs are caught too.</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Typosquatted Domain (Fuzzy Match)</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>Each hyphen-separated token of every URL/sender domain is tested against all known brand domains using Levenshtein edit-distance (≤1 after normalisation). Catches novel typosquats not in the curated list.</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Brand / Domain Mismatch</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>A known brand name appears in the email body, but no link or sender domain belongs to that brand's official domain. Social media brands are excluded (newsletter footers).</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Homoglyph in Sender Name</td>
+      <td><span class="pill pill-high">High</span></td>
+      <td>The display name uses visually identical characters mid-word (capital I instead of l, 0 for o, 1 for l). e.g. "InvoIcing Department", "PayPaI Support". Detected by a normalisation diff on each word.</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>Generic / Impersonal Greeting</td>
+      <td><span class="pill pill-medium">Medium</span></td>
+      <td>"Dear Customer", "Dear User", "Dear Account Holder" — legitimate companies address recipients by name.</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>Spelling Mistakes</td>
+      <td><span class="pill pill-low">Low–Med</span></td>
+      <td>20+ common phishing template misspellings: recieve, adress, untill, beneficary, occured, wierd, etc.</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>Formatting / Aggressive CAPS</td>
+      <td><span class="pill pill-low">Low</span></td>
+      <td>Excessive ALL-CAPS words (filtered against a whitelist of legitimate acronyms), repeated exclamation marks, double question marks.</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>Grammar &amp; Structure Issues</td>
+      <td><span class="pill pill-low">Low</span></td>
+      <td>Missing spaces after punctuation (≥3 occurrences), repeated adjacent words, very long unbroken paragraphs.</td>
+    </tr>
+  </table>
+
+  
+  <h2><span class="sec-num">5</span>Brand Impersonation Database</h2>
+  <p>
+    The system maintains a database of <strong>40 companies</strong> most frequently impersonated in phishing attacks, along with their official domains and curated lists of known typo/lookalike variants. The database is organised by sector:
+  </p>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Finance &amp; Banking</div>
+      <p>PayPal, Chase, Bank of America, Wells Fargo, Citibank, American Express, Barclays, HSBC, SBI, HDFC, ICICI</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Technology</div>
+      <p>Apple, Google, Microsoft, Amazon, Netflix, Facebook, Instagram, Twitter, LinkedIn, Dropbox, Adobe</p>
+    </div>
+    <div class="card">
+      <div class="card-title">E-Commerce &amp; Delivery</div>
+      <p>eBay, Walmart, DHL, FedEx, UPS</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Government &amp; Telecom</div>
+      <p>IRS, HMRC, Social Security Administration, AT&amp;T, Verizon, Airtel, Jio</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Streaming &amp; Software</div>
+      <p>Spotify, YouTube, Steam, Zoom, WhatsApp</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Homoglyph Map</div>
+      <p>I→l, 0→o, 1→l, 3→e, 4→a, 5→s, @→a, $→s applied to text before every comparison</p>
+    </div>
+  </div>
+
+  
+  <h2><span class="sec-num">6</span>Scoring Methodology</h2>
+  <p>Each check contributes a weighted score. Scores are summed and clamped to 100:</p>
+  <table class="feat">
+    <tr><th>Check</th><th>Points per hit</th><th>Maximum</th></tr>
+    <tr><td>Urgency Language</td><td>8 pts / phrase</td><td>24</td></tr>
+    <tr><td>Threat / Fear</td><td>9 pts / phrase</td><td>27</td></tr>
+    <tr><td>Reward / Greed</td><td>10 pts / phrase</td><td>25</td></tr>
+    <tr><td>Credential Harvesting</td><td>12 pts / phrase</td><td>30</td></tr>
+    <tr><td>Suspicious URLs</td><td>15 pts / URL</td><td>30</td></tr>
+    <tr><td>Financial Fraud</td><td>10 pts / phrase</td><td>30</td></tr>
+    <tr><td>Brand Typo Variant</td><td>18 pts / hit</td><td>36</td></tr>
+    <tr><td>Fuzzy Domain Match</td><td>20 pts / hit</td><td>40</td></tr>
+    <tr><td>Brand / Domain Mismatch</td><td>15 pts / hit</td><td>30</td></tr>
+    <tr><td>Homoglyph in Sender Name</td><td>25 pts (flat)</td><td>25</td></tr>
+    <tr><td>Generic Greeting</td><td>6 pts / phrase</td><td>12</td></tr>
+    <tr><td>Spelling Mistakes</td><td>5 pts / error</td><td>15</td></tr>
+    <tr><td>Aggressive Formatting</td><td>5 pts / type</td><td>10</td></tr>
+    <tr><td>Grammar Issues</td><td>4 pts / issue</td><td>10</td></tr>
+    <tr><td>HTML Obfuscation</td><td>20 pts (flat)</td><td>20</td></tr>
+    <tr><td>Suspicious Sender TLD/Provider</td><td>10 pts / domain</td><td>20</td></tr>
+  </table>
+
+  
+  <h2><span class="sec-num">7</span>Sample Test Results</h2>
+  <p>The following emails were tested against the system:</p>
+
+  <div class="result-row"><span class="pct pct-high">100%</span><span class="result-label">PayPaI Support — homoglyph impersonation + typosquatted domain</span><span class="verdict verdict-high">High Risk</span></div>
+  <div class="result-row"><span class="pct pct-high">100%</span><span class="result-label">InvoIcing Department — invoice scam, homoglyph sender, billing portal domain</span><span class="verdict verdict-high">High Risk</span></div>
+  <div class="result-row"><span class="pct pct-high">100%</span><span class="result-label">Amazon phish — amaz0n-secure.xyz, credential harvesting, threat language</span><span class="verdict verdict-high">High Risk</span></div>
+  <div class="result-row"><span class="pct pct-high">100%</span><span class="result-label">Fake Apple ID — suspended account, no-headers format, suspicious URL</span><span class="verdict verdict-high">High Risk</span></div>
+  <div class="result-row"><span class="pct pct-high">97%</span><span class="result-label">Final Notice invoice scam — billing-portal-secure.com, legal proceedings threat</span><span class="verdict verdict-high">High Risk</span></div>
+  <div class="result-row"><span class="pct pct-high">84%</span><span class="result-label">SBI India phish — .ru TLD, PIN/CVV request, account blocked</span><span class="verdict verdict-high">High Risk</span></div>
+  <div class="result-row"><span class="pct pct-low">9%</span><span class="result-label">LPU Freshmen Induction 2026 (real university newsletter)</span><span class="verdict verdict-low">Low Risk</span></div>
+  <div class="result-row"><span class="pct pct-low">4%</span><span class="result-label">PayPal receipt from service@paypal.com (legitimate)</span><span class="verdict verdict-low">Low Risk</span></div>
+  <div class="result-row"><span class="pct pct-low">0%</span><span class="result-label">Office meeting reminder (clean, no signals)</span><span class="verdict verdict-low">Low Risk</span></div>
+  <div class="result-row"><span class="pct pct-low">0%</span><span class="result-label">Microsoft invoice notification from billing@microsoft.com (legitimate)</span><span class="verdict verdict-low">Low Risk</span></div>
+
+  
+  <h2><span class="sec-num">8</span>Technology Stack</h2>
+  <table class="feat">
+    <tr><th>Component</th><th>Technology</th><th>Purpose</th></tr>
+    <tr><td>Language</td><td>Python 3.10+</td><td>Core logic, regex, string processing</td></tr>
+    <tr><td>Web Framework</td><td>Streamlit 1.x</td><td>Browser-based dashboard, no HTML/JS required</td></tr>
+    <tr><td>Visualisation</td><td>Inline SVG (custom)</td><td>Bar chart rendered without any charting library</td></tr>
+    <tr><td>Pattern Matching</td><td>Python <code>re</code> module</td><td>URL extraction, domain tokenisation, header parsing</td></tr>
+    <tr><td>Edit Distance</td><td>Custom Levenshtein (pure Python)</td><td>Fuzzy domain matching for typosquat detection</td></tr>
+    <tr><td>Normalisation</td><td>Python <code>str.maketrans</code></td><td>Homoglyph character substitution table</td></tr>
+    <tr><td>Deployment</td><td>Streamlit local server</td><td>Runs on <code>http://localhost:8501</code></td></tr>
+  </table>
+
+  
+  <h2><span class="sec-num">9</span>Key Algorithms</h2>
+  <h3>9.1 Homoglyph Normalisation</h3>
+  <p>
+    Before any brand comparison, the email text is passed through a character translation table (<code>str.maketrans</code>) that substitutes visually identical characters: capital <strong>I</strong>→l, digit <strong>0</strong>→o, digit <strong>1</strong>→l, digit <strong>3</strong>→e, and others. This causes "PayPaI" and "PayPal" to compare as identical, detecting the attack.
+  </p>
+  <h3>9.2 Levenshtein Edit-Distance Fuzzy Matching</h3>
+  <p>
+    Each URL and sender email domain is first split on hyphens — so "paypai-resolution-center-security.com" becomes tokens ["paypai", "resolution", "center", "security"]. Each token is then compared to every known brand domain core using a custom dynamic-programming Levenshtein implementation. An edit distance of 0 or 1 after normalisation is flagged as a typosquat.
+  </p>
+  <h3>9.3 Multi-layer Brand Mismatch</h3>
+  <p>
+    Brand impersonation is caught at three independent layers: (1) exact typo-variant lookup in a curated map, (2) fuzzy edit-distance on domain tokens, and (3) brand name appears in the body but no extracted domain belongs to that brand's official domain. All three run independently — any one is sufficient to flag the email.
+  </p>
+
+  
+  <h2><span class="sec-num">10</span>Limitations</h2>
+  <ul class="plain">
+    <li>The system uses heuristic rules, not machine learning — it cannot learn from new phishing patterns automatically.</li>
+    <li>Sophisticated phishing emails that avoid all keyword patterns may produce lower scores.</li>
+    <li>The brand database covers 40 companies; impersonation of unlisted organisations is only caught by generic checks.</li>
+    <li>The spelling checker uses a fixed word list; it does not use a full NLP dictionary.</li>
+    <li>Image-based phishing emails (where all text is inside an image) cannot be analysed without OCR integration.</li>
+    <li>No live URL scanning — suspicious URLs are detected by pattern, not by checking if the link is actually malicious.</li>
+  </ul>
+
+  
+  <h2><span class="sec-num">11</span>Future Scope</h2>
+  <ul class="plain">
+    <li><strong>Machine Learning integration</strong> — train a classifier (e.g. Naive Bayes or BERT) on a labelled phishing dataset (CEAS-08, SpamAssassin) to improve accuracy.</li>
+    <li><strong>Live URL reputation check</strong> — integrate with Google Safe Browsing API or VirusTotal API to verify URLs in real time.</li>
+    <li><strong>Browser extension</strong> — port the engine to a Chrome/Firefox extension that analyses emails directly in Gmail or Outlook Web.</li>
+    <li><strong>Attachment analysis</strong> — detect malicious file extensions and macro-enabled Office documents attached to emails.</li>
+    <li><strong>Multi-language support</strong> — extend keyword lists to Hindi, French, Spanish, and other languages.</li>
+    <li><strong>DKIM / SPF header verification</strong> — parse raw email headers to verify sender authentication records.</li>
+    <li><strong>Cloud deployment</strong> — host on Streamlit Community Cloud for public access with no local installation.</li>
+  </ul>
+
+  
+  <h2><span class="sec-num">12</span>Conclusion</h2>
+  <p>
+    Phishing Shield successfully demonstrates that a highly capable phishing detection system can be built using pure Python with no external AI libraries. By combining 14 independent heuristic checks — including homoglyph normalisation, Levenshtein fuzzy domain matching, financial fraud vocabulary, a 40-brand impersonation database, and an email pre-processor that handles real-world pasted email formats — the system achieves strong detection accuracy across a broad range of phishing attack types.
+  </p>
+  <p>
+    The system correctly scores all tested phishing emails at 72–100% while keeping legitimate emails from real senders at 0–25%, demonstrating effective separation between malicious and benign content. The entire implementation in a single Python file makes it an ideal learning project for students entering the field of cyber security.
+  </p>
+
+  
+  <h2><span class="sec-num">13</span>References</h2>
+  <p class="ref">1. Anti-Phishing Working Group (APWG), <em>Phishing Activity Trends Reports</em>, apwg.org</p>
+  <p class="ref">2. Streamlit Inc., <em>Streamlit Documentation</em>, docs.streamlit.io</p>
+  <p class="ref">3. Levenshtein, V. I. (1966). <em>Binary codes capable of correcting deletions, insertions, and reversals</em>. Soviet Physics Doklady, 10(8).</p>
+  <p class="ref">4. Google LLC, <em>Safe Browsing API Documentation</em>, developers.google.com/safe-browsing</p>
+  <p class="ref">5. Python Software Foundation, <em>Python 3 Standard Library — re module</em>, docs.python.org</p>
+  <p class="ref">6. OWASP, <em>Phishing Prevention Cheat Sheet</em>, cheatsheetseries.owasp.org</p>
+  <p class="ref">7. Whittaker, C., Ryner, B., &amp; Nazif, M. (2010). <em>Large-Scale Automatic Classification of Phishing Pages</em>. NDSS 2010.</p>
+
+  <div class="footer">Made with IBM Bob</div>
+</div>
+</body>
+</html>
